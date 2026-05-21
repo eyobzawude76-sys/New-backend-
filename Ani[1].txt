@@ -1,0 +1,118 @@
+"use client";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+
+export default function StudentPage() {
+  const router = useRouter();
+  const [results, setResults] = useState([]);
+  const [semester, setSemester] = useState("semester_1");
+  const [name, setName] = useState("");
+
+  // Token hordofuuf
+  const getToken = () => typeof window !== "undefined" ? localStorage.getItem("token") : "";
+
+  const fetchResults = useCallback(async () => {
+    const token = getToken();
+    if (!token) return;
+
+    try {
+      const res = await fetch(
+        `http://localhost:8000/student/my-result?semester=${semester}`,
+        { 
+          headers: { Authorization: `Bearer ${token}` } 
+        }
+      );
+      
+      if (res.status === 401) {
+        localStorage.clear();
+        router.push("/login");
+        return;
+      }
+
+      const data = await res.json();
+      setResults(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
+  }, [semester, router]);
+
+  useEffect(() => {
+    setName(localStorage.getItem("name") || "Barataa");
+    fetchResults();
+  }, [fetchResults]);
+
+  const downloadResult = () => {
+    const token = getToken();
+    // Suuraa 1000026359.jpg irratti akka mul'atutti URL sirriin kana:
+    const url = `http://localhost:8000/student/download-result?semester=${semester}&token=${token}`;
+    window.open(url, "_blank");
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <div className="bg-orange-600 text-white p-4 flex justify-between items-center">
+        <h1 className="text-xl font-bold">👨‍🎓 Student Dashboard</h1>
+        <button
+          onClick={() => { localStorage.clear(); router.push("/login"); }}
+          className="bg-white text-orange-600 px-4 py-1 rounded-lg text-sm"
+        >
+          Logout
+        </button>
+      </div>
+
+      <div className="p-4">
+        <div className="bg-white p-4 rounded-xl shadow mb-4">
+          <p className="text-lg font-bold">Nagaatti, {name}! 👋</p>
+        </div>
+
+        <div className="bg-white p-4 rounded-xl shadow mb-4">
+          <h2 className="font-bold mb-3">📊 Result Kee Ilaali</h2>
+          <select
+            value={semester}
+            onChange={(e) => setSemester(e.target.value)}
+            className="w-full border rounded-lg p-2 mb-3 text-black"
+          >
+            <option value="semester_1">Semester 1</option>
+            <option value="semester_2">Semester 2</option>
+            <option value="year_1">Year 1</option>
+            <option value="year_2">Year 2</option>
+          </select>
+          
+          <button
+            onClick={fetchResults}
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg mb-2 transition-colors"
+          >
+            Ilaali
+          </button>
+          
+          <button
+            onClick={downloadResult}
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition-colors"
+          >
+            📄 PDF Download
+          </button>
+        </div>
+
+        {/* Results Display */}
+        <div className="space-y-3">
+          {results.length === 0 ? (
+            <p className="text-gray-500 text-center bg-white p-4 rounded-xl shadow">Result hin argamne</p>
+          ) : (
+            results.map((r, index) => (
+              <div key={index} className="bg-white p-4 rounded-xl shadow border-l-4 border-orange-500">
+                <p className="font-bold text-gray-800">Course: {r.course_id || r.course_name}</p>
+                <div className="flex justify-between mt-2">
+                  <p className="text-gray-600">Average: {r.average}/100</p>
+                  <p className={`font-bold ${
+                    r.grade === "A" ? "text-green-600" : "text-blue-600"
+                  }`}>Grade: {r.grade}</p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
