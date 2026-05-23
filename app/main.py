@@ -1,13 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.routes import auth, admin, teacher, committee, student
 import os
-
-os.makedirs("uploads", exist_ok=True)
 
 app = FastAPI(title="University Management System")
 
+# 1. Dursa CORS saquu qabna (Routes import ta'uu dura)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,6 +13,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 2. Amma immoo route-wwan dabalanna
+from app.routes import auth, admin, teacher, committee, student
+
+os.makedirs("uploads", exist_ok=True)
 
 @app.get("/public/courses")
 async def get_public_courses():
