@@ -3,19 +3,24 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
 
-# 1. Dursa APP uumna
+# 1. App uumna
 app = FastAPI(title="University Management System")
 
-# 2. ISAA BOODA CORS daddafnee gaddaan lakkifna (Eeyyama hundaaf saaqna)
+# 2. CORS Sirreessuu: Origin saanduqa Netlify keetii qofa eeyyamna!
+origins = [
+    "https://fastidious-lolly-c16a99.netlify.app",
+    "http://localhost:3000"  # Hojii local keetiifis akka sihafuuf
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,          # Urjii (*) sana dhiifnee linkii sirrii galchine!
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 3. KUNIS AMMA JALLATTI DHUFA: Erga CORS qophaa'ee booda route-wwan import ta'u
+# 3. Route-wwan import ta'u
 from app.routes import auth, admin, teacher, committee, student
 
 os.makedirs("uploads", exist_ok=True)
@@ -28,7 +33,7 @@ async def get_public_courses():
         c["_id"] = str(c["_id"])
     return courses
 
-# 4. Route-wwan include gochuu
+# 4. Include Routers
 app.include_router(auth.router)
 app.include_router(admin.router)
 app.include_router(teacher.router)
