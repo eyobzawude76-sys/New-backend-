@@ -3,8 +3,7 @@ import os
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 
-# Env dubbisuuf
-load_dotenv()
+
 
 # Render irraas ta'e .env irraa kallattiin fida
 MONGO_URL = os.getenv("MONGODB_URL")
