@@ -144,7 +144,7 @@ async def upload_documents(
     folder_name = email.replace("@", "_").replace(".", "_") if email else upload_id
     upload_dir = f"uploads/{folder_name}"
     os.makedirs(upload_dir, exist_ok=True)
-
+# kandhaa
     paths = {}
     for file, filename in [
         (national_id_photo, "national_id"),
