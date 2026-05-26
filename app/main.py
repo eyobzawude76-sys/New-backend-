@@ -7,14 +7,11 @@ import os
 app = FastAPI(title="University Management System")
 
 # 2. CORS Sirreessuu: Origin saanduqa Netlify keetii qofa eeyyamna!
-origins = [
-    "https://fastidious-lolly-c16a99.netlify.app",
-    "http://localhost:3000"  # Hojii local keetiifis akka sihafuuf
-]
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,          # Urjii (*) sana dhiifnee linkii sirrii galchine!
+    allow_origins=["*"],          # Urjii (*) sana dhiifnee linkii sirrii galchine!
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
